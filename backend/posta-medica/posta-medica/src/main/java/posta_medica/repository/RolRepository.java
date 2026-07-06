@@ -1,0 +1,7 @@
+package posta_medica.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import posta_medica.model.Rol;
+
+public interface RolRepository extends JpaRepository<Rol, Integer> {
+}

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Subreporte: lista de medicamentos de la receta -->
+<jasperReport name="receta_medicamentos" language="java"
+    pageWidth="555" pageHeight="842"
+    columnWidth="555" leftMargin="0" rightMargin="0"
+    topMargin="0" bottomMargin="0">
+
+    <parameter name="PARAM_ID_ATENCION" class="java.lang.String"/>
+
+    <query language="SQL"><![CDATA[
+        SELECT
+            med.nombre        AS medicamento,
+            rm.dosis,
+            rm.frecuencia,
+            rm.duracion
+        FROM receta r
+        INNER JOIN receta_medicamento rm ON r.id_receta = rm.id_receta
+        INNER JOIN medicamento med       ON rm.id_medicamento = med.id_medicamento
+        WHERE r.id_atencion = $P{PARAM_ID_ATENCION}
+    ]]></query>
+
+    <field name="medicamento" class="java.lang.String"/>
+    <field name="dosis"       class="java.lang.String"/>
+    <field name="frecuencia"  class="java.lang.String"/>
+    <field name="duracion"    class="java.lang.String"/>
+
+    <background splitType="Stretch"/>
+
+    <detail>
+        <band height="24" splitType="Stretch">
+            <element kind="textField" x="2" y="2" width="158" height="20"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0" textAdjust="StretchHeight">
+                <expression><![CDATA[$F{medicamento}]]></expression>
+            </element>
+            <element kind="textField" x="162" y="2" width="98" height="20"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0">
+                <expression><![CDATA[$F{dosis}]]></expression>
+            </element>
+            <element kind="textField" x="262" y="2" width="138" height="20"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0">
+                <expression><![CDATA[$F{frecuencia}]]></expression>
+            </element>
+            <element kind="textField" x="402" y="2" width="148" height="20"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0">
+                <expression><![CDATA[$F{duracion}]]></expression>
+            </element>
+            <element kind="line" x="0" y="22" width="555" height="1"
+                forecolor="#EEF4F6"/>
+        </band>
+    </detail>
+
+</jasperReport>

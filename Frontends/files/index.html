@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Posta Médica</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Pantalla de carga inicial -->
+      <div id="splash" style="
+        min-height:100vh; display:flex; flex-direction:column;
+        align-items:center; justify-content:center; gap:16px;
+        background:#f5f7fb; font-family:'Segoe UI',Arial,sans-serif;
+        color:#607080;">
+        <div style="
+          width:52px; height:52px; border-radius:10px;
+          background:#0f766e; color:#fff;
+          display:flex; align-items:center; justify-content:center;
+          font-size:28px; font-weight:900;">+</div>
+        <div style="font-size:20px; font-weight:800; color:#16212a;">Posta Médica</div>
+        <div style="font-size:14px;">Conectando con el servidor…</div>
+        <div id="splash-error" style="
+          display:none; margin-top:8px; padding:12px 16px;
+          background:#fff4f4; border:1px solid #f0caca;
+          border-radius:8px; color:#8f1d1d; max-width:420px; text-align:center;
+          font-size:14px; line-height:1.5;">
+        </div>
+      </div>
+    </div>
+    <!--
+      ╔══════════════════════════════════════════════════════════╗
+      ║  CONFIGURACIÓN                                           ║
+      ║  Si tu backend corre en otro puerto, edita API_BASE     ║
+      ║  en la primera línea de app.js                          ║
+      ║                                                          ║
+      ║  CORS: @CrossOrigin("*") ya está en tus controllers,    ║
+      ║  así que en desarrollo funciona sin cambios.             ║
+      ╚══════════════════════════════════════════════════════════╝
+    -->
+    <script src="app.js"></script>
+  </body>
+</html>

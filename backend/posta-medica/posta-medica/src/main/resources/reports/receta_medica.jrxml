@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Receta Médica — Posta Médica -->
+<jasperReport name="receta_medica" language="java"
+    pageWidth="595" pageHeight="842"
+    columnWidth="555" leftMargin="20" rightMargin="20"
+    topMargin="20" bottomMargin="20">
+
+    <!-- Parámetro: ID de la atención -->
+    <parameter name="PARAM_ID_ATENCION" class="java.lang.String"/>
+
+    <!-- Query principal: trae todo desde atencion -->
+    <query language="SQL"><![CDATA[
+        SELECT
+            at.id_atencion,
+            at.fecha_atencion,
+            at.motivo_consulta,
+            at.diagnostico,
+            r.observaciones,
+            c.id_cita,
+            c.fecha_cita,
+            CONCAT(p.nombre, ' ', p.apellido) AS paciente,
+            p.dni,
+            p.fecha_nacimiento,
+            CONCAT(m.nombre, ' ', m.apellido) AS medico,
+            e.nombre AS especialidad
+        FROM atencion at
+        INNER JOIN receta r     ON r.id_atencion    = at.id_atencion
+        INNER JOIN cita c       ON at.id_cita       = c.id_cita
+        INNER JOIN paciente p   ON c.id_paciente     = p.id_paciente
+        INNER JOIN medico m     ON c.id_medico       = m.id_medico
+        INNER JOIN especialidad e ON m.id_especialidad = e.id_especialidad
+        WHERE at.id_atencion = $P{PARAM_ID_ATENCION}
+    ]]></query>
+
+    <!-- Subquery: medicamentos de la receta -->
+    <parameter name="PARAM_SUBREPORT" class="net.sf.jasperreports.engine.JasperReport"/>
+
+    <field name="id_atencion"     class="java.lang.String"/>
+    <field name="fecha_atencion"  class="java.util.Date"/>
+    <field name="motivo_consulta" class="java.lang.String"/>
+    <field name="diagnostico"     class="java.lang.String"/>
+    <field name="observaciones"   class="java.lang.String"/>
+    <field name="id_cita"         class="java.lang.String"/>
+    <field name="fecha_cita"      class="java.sql.Date"/>
+    <field name="paciente"        class="java.lang.String"/>
+    <field name="dni"             class="java.lang.String"/>
+    <field name="fecha_nacimiento" class="java.sql.Date"/>
+    <field name="medico"          class="java.lang.String"/>
+    <field name="especialidad"    class="java.lang.String"/>
+
+    <background splitType="Stretch"/>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- TÍTULO / ENCABEZADO                        -->
+    <!-- ══════════════════════════════════════════ -->
+    <title height="110" splitType="Stretch">
+        <!-- Barra verde superior -->
+        <element kind="rectangle" x="0" y="0" width="555" height="80"
+            forecolor="#0F766E" backcolor="#0F766E" mode="Opaque" stretchType="NoStretch"/>
+        <!-- Logo "+" -->
+        <element kind="rectangle" x="10" y="10" width="50" height="50"
+            forecolor="#FFFFFF" backcolor="#FFFFFF" mode="Opaque" stretchType="NoStretch" radius="6"/>
+        <element kind="staticText" x="10" y="10" width="50" height="50"
+            forecolor="#0F766E" fontName="Arial" fontSize="28.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[+]]></text>
+        </element>
+        <!-- Nombre clínica -->
+        <element kind="staticText" x="70" y="10" width="300" height="30"
+            forecolor="#FFFFFF" fontName="Arial" fontSize="20.0" bold="true">
+            <text><![CDATA[Posta Médica]]></text>
+        </element>
+        <element kind="staticText" x="70" y="40" width="300" height="20"
+            forecolor="#A7D8D2" fontName="Arial" fontSize="11.0">
+            <text><![CDATA[Sistema de Gestión Clínica]]></text>
+        </element>
+        <!-- Título RECETA -->
+        <element kind="staticText" x="380" y="15" width="165" height="22"
+            forecolor="#FFFFFF" fontName="Arial" fontSize="14.0" bold="true" hTextAlign="Right">
+            <text><![CDATA[RECETA MÉDICA]]></text>
+        </element>
+        <!-- N° Atención -->
+        <element kind="staticText" x="380" y="40" width="80" height="18"
+            forecolor="#A7D8D2" fontName="Arial" fontSize="10.0" hTextAlign="Right">
+            <text><![CDATA[N° Atención:]]></text>
+        </element>
+        <element kind="textField" x="462" y="40" width="83" height="18"
+            forecolor="#FFFFFF" fontName="Arial" fontSize="10.0" bold="true">
+            <expression><![CDATA[$F{id_atencion}]]></expression>
+        </element>
+        <!-- Fecha -->
+        <element kind="staticText" x="380" y="58" width="80" height="18"
+            forecolor="#A7D8D2" fontName="Arial" fontSize="10.0" hTextAlign="Right">
+            <text><![CDATA[Fecha:]]></text>
+        </element>
+        <element kind="textField" x="462" y="58" width="83" height="18"
+            forecolor="#FFFFFF" fontName="Arial" fontSize="10.0" pattern="dd/MM/yyyy">
+            <expression><![CDATA[$F{fecha_atencion}]]></expression>
+        </element>
+    </title>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- DETALLE                                    -->
+    <!-- ══════════════════════════════════════════ -->
+    <detail>
+        <!-- BAND 1: Médico + Paciente lado a lado -->
+        <band height="160" splitType="Stretch">
+            <!-- Sección MÉDICO (izquierda) -->
+            <element kind="rectangle" x="0" y="8" width="265" height="140"
+                forecolor="#F0FAF8" backcolor="#F0FAF8" mode="Opaque" stretchType="NoStretch" radius="4"/>
+            <element kind="rectangle" x="0" y="8" width="4" height="140"
+                forecolor="#0F766E" backcolor="#0F766E" mode="Opaque" stretchType="NoStretch"/>
+            <element kind="staticText" x="10" y="12" width="250" height="18"
+                forecolor="#0F766E" fontName="Arial" fontSize="10.0" bold="true">
+                <text><![CDATA[DATOS DEL MÉDICO]]></text>
+            </element>
+            <element kind="staticText" x="10" y="36" width="80" height="16"
+                forecolor="#607080" fontName="Arial" fontSize="9.0" bold="true">
+                <text><![CDATA[Médico:]]></text>
+            </element>
+            <element kind="textField" x="90" y="36" width="170" height="16"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0">
+                <expression><![CDATA["Dr(a). " + $F{medico}]]></expression>
+            </element>
+            <element kind="staticText" x="10" y="56" width="80" height="16"
+                forecolor="#607080" fontName="Arial" fontSize="9.0" bold="true">
+                <text><![CDATA[Especialidad:]]></text>
+            </element>
+            <element kind="textField" x="90" y="56" width="170" height="16"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0">
+                <expression><![CDATA[$F{especialidad}]]></expression>
+            </element>
+            <element kind="staticText" x="10" y="76" width="80" height="16"
+                forecolor="#607080" fontName="Arial" fontSize="9.0" bold="true">
+                <text><![CDATA[N° Cita:]]></text>
+            </element>
+            <element kind="textField" x="90" y="76" width="170" height="16"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0">
+                <expression><![CDATA[$F{id_cita}]]></expression>
+            </element>
+            <element kind="staticText" x="10" y="96" width="80" height="16"
+                forecolor="#607080" fontName="Arial" fontSize="9.0" bold="true">
+                <text><![CDATA[Fecha cita:]]></text>
+            </element>
+            <element kind="textField" x="90" y="96" width="170" height="16"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0" pattern="dd/MM/yyyy">
+                <expression><![CDATA[$F{fecha_cita}]]></expression>
+            </element>
+
+            <!-- Sección PACIENTE (derecha) -->
+            <element kind="rectangle" x="285" y="8" width="270" height="140"
+                forecolor="#F5F7FB" backcolor="#F5F7FB" mode="Opaque" stretchType="NoStretch" radius="4"/>
+            <element kind="rectangle" x="285" y="8" width="4" height="140"
+                forecolor="#2563EB" backcolor="#2563EB" mode="Opaque" stretchType="NoStretch"/>
+            <element kind="staticText" x="295" y="12" width="255" height="18"
+                forecolor="#2563EB" fontName="Arial" fontSize="10.0" bold="true">
+                <text><![CDATA[DATOS DEL PACIENTE]]></text>
+            </element>
+            <element kind="staticText" x="295" y="36" width="80" height="16"
+                forecolor="#607080" fontName="Arial" fontSize="9.0" bold="true">
+                <text><![CDATA[Paciente:]]></text>
+            </element>
+            <element kind="textField" x="375" y="36" width="175" height="16"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0">
+                <expression><![CDATA[$F{paciente}]]></expression>
+            </element>
+            <element kind="staticText" x="295" y="56" width="80" height="16"
+                forecolor="#607080" fontName="Arial" fontSize="9.0" bold="true">
+                <text><![CDATA[DNI:]]></text>
+            </element>
+            <element kind="textField" x="375" y="56" width="175" height="16"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0">
+                <expression><![CDATA[$F{dni}]]></expression>
+            </element>
+            <element kind="staticText" x="295" y="76" width="80" height="16"
+                forecolor="#607080" fontName="Arial" fontSize="9.0" bold="true">
+                <text><![CDATA[F. Nacimiento:]]></text>
+            </element>
+            <element kind="textField" x="375" y="76" width="175" height="16"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0" pattern="dd/MM/yyyy">
+                <expression><![CDATA[$F{fecha_nacimiento}]]></expression>
+            </element>
+        </band>
+
+        <!-- BAND 2: Motivo + Diagnóstico -->
+        <band height="120" splitType="Stretch">
+            <element kind="staticText" x="0" y="8" width="555" height="18"
+                forecolor="#0F766E" fontName="Arial" fontSize="10.0" bold="true">
+                <text><![CDATA[MOTIVO Y DIAGNÓSTICO]]></text>
+            </element>
+            <element kind="line" x="0" y="26" width="555" height="1"
+                forecolor="#D9E2E7"/>
+            <element kind="staticText" x="0" y="32" width="80" height="16"
+                forecolor="#607080" fontName="Arial" fontSize="9.0" bold="true">
+                <text><![CDATA[Motivo:]]></text>
+            </element>
+            <element kind="textField" x="85" y="32" width="470" height="16"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0" textAdjust="StretchHeight">
+                <expression><![CDATA[$F{motivo_consulta}]]></expression>
+            </element>
+            <element kind="staticText" x="0" y="56" width="80" height="16"
+                forecolor="#607080" fontName="Arial" fontSize="9.0" bold="true">
+                <text><![CDATA[Diagnóstico:]]></text>
+            </element>
+            <element kind="textField" x="85" y="56" width="470" height="30"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0" textAdjust="StretchHeight">
+                <expression><![CDATA[$F{diagnostico}]]></expression>
+            </element>
+        </band>
+
+        <!-- BAND 3: Medicamentos -->
+        <band height="200" splitType="Stretch">
+            <element kind="staticText" x="0" y="8" width="555" height="18"
+                forecolor="#0F766E" fontName="Arial" fontSize="10.0" bold="true">
+                <text><![CDATA[MEDICAMENTOS PRESCRITOS]]></text>
+            </element>
+            <element kind="line" x="0" y="26" width="555" height="1"
+                forecolor="#D9E2E7"/>
+            <!-- Cabecera tabla -->
+            <element kind="rectangle" x="0" y="30" width="555" height="20"
+                forecolor="#F8FAFC" backcolor="#F8FAFC" mode="Opaque" stretchType="NoStretch"/>
+            <element kind="staticText" x="2" y="32" width="160" height="16"
+                forecolor="#455767" fontName="Arial" fontSize="8.0" bold="true">
+                <text><![CDATA[MEDICAMENTO]]></text>
+            </element>
+            <element kind="staticText" x="162" y="32" width="100" height="16"
+                forecolor="#455767" fontName="Arial" fontSize="8.0" bold="true">
+                <text><![CDATA[DOSIS]]></text>
+            </element>
+            <element kind="staticText" x="262" y="32" width="140" height="16"
+                forecolor="#455767" fontName="Arial" fontSize="8.0" bold="true">
+                <text><![CDATA[FRECUENCIA]]></text>
+            </element>
+            <element kind="staticText" x="402" y="32" width="150" height="16"
+                forecolor="#455767" fontName="Arial" fontSize="8.0" bold="true">
+                <text><![CDATA[DURACIÓN]]></text>
+            </element>
+            <!-- Subreporte de medicamentos -->
+            <element kind="subreport" x="0" y="52" width="555" height="140"
+                stretchType="ElementGroupHeight">
+                <parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+                <parameter name="PARAM_ID_ATENCION">
+                    <expression><![CDATA[$F{id_atencion}]]></expression>
+                </parameter>
+                <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                <expression><![CDATA[$P{PARAM_SUBREPORT}]]></expression>
+            </element>
+        </band>
+
+        <!-- BAND 4: Observaciones -->
+        <band height="100" splitType="Stretch">
+            <element kind="staticText" x="0" y="8" width="555" height="18"
+                forecolor="#0F766E" fontName="Arial" fontSize="10.0" bold="true">
+                <text><![CDATA[OBSERVACIONES / INDICACIONES]]></text>
+            </element>
+            <element kind="line" x="0" y="26" width="555" height="1"
+                forecolor="#D9E2E7"/>
+            <element kind="textField" x="0" y="32" width="555" height="60"
+                forecolor="#16212A" fontName="Arial" fontSize="9.0" textAdjust="StretchHeight">
+                <expression><![CDATA[$F{observaciones} != null ? $F{observaciones} : "Sin observaciones adicionales."]]></expression>
+            </element>
+        </band>
+    </detail>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- PIE DE PÁGINA                              -->
+    <!-- ══════════════════════════════════════════ -->
+    <pageFooter height="50" splitType="Stretch">
+        <element kind="line" x="0" y="4" width="555" height="1"
+            forecolor="#D9E2E7"/>
+        <element kind="staticText" x="0" y="10" width="555" height="16"
+            forecolor="#9AB0BD" fontName="Arial" fontSize="8.0" hTextAlign="Center">
+            <text><![CDATA[Este documento es un comprobante médico oficial de Posta Médica — Sistema de Gestión Clínica]]></text>
+        </element>
+        <element kind="staticText" x="350" y="26" width="200" height="16"
+            forecolor="#324350" fontName="Arial" fontSize="8.0" bold="true" hTextAlign="Center">
+            <text><![CDATA[Firma y sello del médico]]></text>
+        </element>
+        <element kind="line" x="350" y="24" width="200" height="1"
+            forecolor="#324350"/>
+    </pageFooter>
+
+</jasperReport>
